@@ -393,8 +393,8 @@ int Board::Random_move(void){
 	if(current_color==2){
 		srand (time(NULL));
 		int rmove=rand() % valid_move_count[1];
-		cout<<"valid_move_count:"<<valid_move_count[1]<<endl;
-		cout<<"random move:"<<rmove<<endl;
+		// cout<<"valid_move_count:"<<valid_move_count[1]<<endl;
+		// cout<<"random move:"<<rmove<<endl;
 		int i= comp_move_list_i[rmove];
 		int j= comp_move_list_j[rmove];
 		board[i][j]=current_color;
@@ -407,7 +407,7 @@ int Board::Random_move(void){
 		} else{
 			cout<<"Invalid move\t Try Again\n";
 			board[i][j]=0;
-			Print_board();
+			// Print_board();
 			return 1;
 		}
 	}
