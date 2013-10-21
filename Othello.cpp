@@ -384,6 +384,8 @@ int Board::Make_move(int j, int i, int color){
 		return 0;
 	} else{
 		cout<<"Invalid move\t Try Again\n";
+		board[i][j]=0;
+		Print_board();
 		return 1;
 	}
 }
@@ -404,6 +406,8 @@ int Board::Random_move(void){
 			return 0;
 		} else{
 			cout<<"Invalid move\t Try Again\n";
+			board[i][j]=0;
+			Print_board();
 			return 1;
 		}
 	}
@@ -427,19 +431,20 @@ int main () {
 	game.Find_valid_moves(game.current_color);
 	game.Print_board();
 	while(!game.Check_if_over()){
-	cout<<"Pick one of the valid moves\n";
-	cout<<"x value:";
-	cin>>x;
-	cout<<"\ny value:";
-	cin>>y;
-	cout<<endl;
-	game.Make_move(x, y, game.current_color);
-	if(game.Check_if_over())
-		break;
-	cout<<"Computer will now move randomly";
-	cin>>waiting;
-	cout<<endl;
-	game.Random_move();
+		cout<<"Pick one of the valid moves\n";
+		cout<<"x value:";
+		cin>>x;
+		cout<<"\ny value:";
+		cin>>y;
+		cout<<endl;
+		if(game.Make_move(x, y, game.current_color)==0){
+			if(game.Check_if_over())
+				break;
+			cout<<"Computer will now move randomly";
+			cin>>waiting;
+			cout<<endl;
+			game.Random_move();
+		}
 	}
 	return 0;
 	}
