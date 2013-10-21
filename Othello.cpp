@@ -13,16 +13,16 @@ class Board{
 	int count_white;
 	int count_black;
 	int move_count;
-int Reset_board(void);
-int Evaluate_board(int x, int y, int color);
+	int Reset_board(void);
+	int Evaluate_board(int x, int y, int color);
 public:
-Board(void);
-int current_color;
-int Find_valid_moves(int color);
-int Make_move(int x, int y, int color);
-int Random_move(void);
-int Print_board(void);
-bool Check_if_over(void); 
+	Board(void);
+	int current_color;
+	int Find_valid_moves(int color);
+	int Make_move(int x, int y, int color);
+	int Random_move(void);
+	int Print_board(void);
+	bool Check_if_over(void); 
 };
 
 
