@@ -8,10 +8,11 @@ class Board{
 	int board[8][8];
 	bool valid_moves[2][8][8];
 	int valid_move_count[2];
-	int comp_move_list_i[25];
-	int comp_move_list_j[25];
+	int movelist_i[2][25];
+	int movelist_j[2][25];
 	int count_white;
 	int count_black;
+	int piece_count[2];
 	int move_count;
 	int Reset_board(void);
 	int Evaluate_board(int x, int y, int color);
@@ -44,6 +45,8 @@ int Board::Reset_board(void){
 	board[4][4]=2;
 	count_white=2;
 	count_black=2;
+	piece_count[0]=2;
+	piece_count[1]=2;
 return 0;
 }
 
@@ -90,8 +93,8 @@ int Board::Find_valid_moves(int color){
 					if(board[i-n][j-n]==color){
 						valid_moves[cindex][i][j]=true;
 						if(color==2){
-							comp_move_list_i[valid_move_count[1]]=i;
-							comp_move_list_j[valid_move_count[1]]=j;								
+							movelist_i[1][valid_move_count[1]]=i;
+							movelist_j[1][valid_move_count[1]]=j;								
 						}
 						valid_move_count[cindex]++;
 						break;
@@ -108,8 +111,8 @@ int Board::Find_valid_moves(int color){
 					if(board[i-n][j]==color){
 						valid_moves[cindex][i][j]=true;
 						if(color==2){
-							comp_move_list_i[valid_move_count[1]]=i;
-							comp_move_list_j[valid_move_count[1]]=j;								
+							movelist_i[1][valid_move_count[1]]=i;
+							movelist_j[1][valid_move_count[1]]=j;								
 						}
 						valid_move_count[cindex]++;
 						break;
@@ -126,8 +129,8 @@ int Board::Find_valid_moves(int color){
 					if(board[i-n][j+n]==color){
 						valid_moves[cindex][i][j]=true;
 						if(color==2){
-							comp_move_list_i[valid_move_count[1]]=i;
-							comp_move_list_j[valid_move_count[1]]=j;								
+							movelist_i[1][valid_move_count[1]]=i;
+							movelist_j[1][valid_move_count[1]]=j;								
 						}
 						valid_move_count[cindex]++;
 						break;
@@ -143,8 +146,8 @@ int Board::Find_valid_moves(int color){
 					if(board[i][j-n]==color){
 						valid_moves[cindex][i][j]=true;
 						if(color==2){
-							comp_move_list_i[valid_move_count[1]]=i;
-							comp_move_list_j[valid_move_count[1]]=j;								
+							movelist_i[1][valid_move_count[1]]=i;
+							movelist_j[1][valid_move_count[1]]=j;								
 						}
 						valid_move_count[cindex]++;
 						break;
@@ -160,8 +163,8 @@ int Board::Find_valid_moves(int color){
 					if(board[i][j+n]==color){
 						valid_moves[cindex][i][j]=true;
 						if(color==2){
-							comp_move_list_i[valid_move_count[1]]=i;
-							comp_move_list_j[valid_move_count[1]]=j;								
+							movelist_i[1][valid_move_count[1]]=i;
+							movelist_j[1][valid_move_count[1]]=j;								
 						}
 						valid_move_count[cindex]++;
 						break;
@@ -178,8 +181,8 @@ int Board::Find_valid_moves(int color){
 					if(board[i+n][j-n]==color){
 						valid_moves[cindex][i][j]=true;
 						if(color==2){
-							comp_move_list_i[valid_move_count[1]]=i;
-							comp_move_list_j[valid_move_count[1]]=j;								
+							movelist_i[1][valid_move_count[1]]=i;
+							movelist_j[1][valid_move_count[1]]=j;								
 						}
 						valid_move_count[cindex]++;
 						break;
@@ -195,8 +198,8 @@ int Board::Find_valid_moves(int color){
 					if(board[i+n][j]==color){
 						valid_moves[cindex][i][j]=true;
 						if(color==2){
-							comp_move_list_i[valid_move_count[1]]=i;
-							comp_move_list_j[valid_move_count[1]]=j;								
+							movelist_i[1][valid_move_count[1]]=i;
+							movelist_j[1][valid_move_count[1]]=j;								
 						}
 						valid_move_count[cindex]++;
 						break;
@@ -212,8 +215,8 @@ int Board::Find_valid_moves(int color){
 					if(board[i+n][j+n]==color){
 						valid_moves[cindex][i][j]=true;
 						if(color==2){
-							comp_move_list_i[valid_move_count[1]]=i;
-							comp_move_list_j[valid_move_count[1]]=j;								
+							movelist_i[1][valid_move_count[1]]=i;
+							movelist_j[1][valid_move_count[1]]=j;								
 						}
 						valid_move_count[cindex]++;
 						break;
@@ -239,11 +242,12 @@ int Board::Evaluate_board(int i, int j, int color){
 	if(!valid_moves[color-1][i][j])
 		return 1;
 	else{
-		int opcolor,n;
+		int opcolor,n, cindex=color-1, opindex;
 		if(color==1)
 			opcolor=2;
 		else
 			opcolor=1;
+		opindex=opcolor-1;
 		//topleft
 		if(i>1 && j>1 && board[i-1][j-1]==opcolor){			
 			for(n=2;n<=i ||n<=j;n++){
@@ -251,6 +255,8 @@ int Board::Evaluate_board(int i, int j, int color){
 					while(n>1){
 						--n;
 						board[i-n][j-n]=color;
+						piece_count[cindex]++;
+						piece_count[opindex]--;
 					}
 					break;
 				}
@@ -267,6 +273,8 @@ int Board::Evaluate_board(int i, int j, int color){
 					while(n>1){
 						--n;
 						board[i-n][j]=color;
+						piece_count[cindex]++;
+						piece_count[opindex]--;
 					}
 					break;
 				}
@@ -283,6 +291,8 @@ int Board::Evaluate_board(int i, int j, int color){
 					while(n>1){
 						--n;
 						board[i-n][j+n]=color;
+						piece_count[cindex]++;
+						piece_count[opindex]--;
 					}
 					break;
 				}
@@ -300,6 +310,8 @@ int Board::Evaluate_board(int i, int j, int color){
 					while(n>1){
 						--n;
 						board[i][j-n]=color;
+						piece_count[cindex]++;
+						piece_count[opindex]--;
 					}
 					break;
 				}
@@ -315,6 +327,8 @@ int Board::Evaluate_board(int i, int j, int color){
 					while(n>1){
 						--n;
 						board[i][j+n]=color;
+						piece_count[cindex]++;
+						piece_count[opindex]--;
 					}
 					break;
 				}
@@ -331,6 +345,8 @@ int Board::Evaluate_board(int i, int j, int color){
 					while(n>1){
 						--n;
 						board[i+n][j-n]=color;
+						piece_count[cindex]++;
+						piece_count[opindex]--;
 					}
 					break;
 				}
@@ -346,6 +362,8 @@ int Board::Evaluate_board(int i, int j, int color){
 					while(n>1){
 						--n;
 						board[i+n][j]=color;
+						piece_count[cindex]++;
+						piece_count[opindex]--;
 					}
 					break;
 				}
@@ -361,6 +379,8 @@ int Board::Evaluate_board(int i, int j, int color){
 					while(n>1){
 						--n;
 						board[i+n][j+n]=color;
+						piece_count[cindex]++;
+						piece_count[opindex]--;
 					}
 					break;
 				}
@@ -395,8 +415,8 @@ int Board::Random_move(void){
 		int rmove=rand() % valid_move_count[1];
 		// cout<<"valid_move_count:"<<valid_move_count[1]<<endl;
 		// cout<<"random move:"<<rmove<<endl;
-		int i= comp_move_list_i[rmove];
-		int j= comp_move_list_j[rmove];
+		int i= movelist_i[1][rmove];
+		int j= movelist_j[1][rmove];
 		board[i][j]=current_color;
 		Print_board();
 		cout<< "Evaluating board\n\n";
@@ -415,8 +435,10 @@ int Board::Random_move(void){
 		return 1;
 }
 bool Board::Check_if_over(void){
-	if(valid_move_count[current_color]==0)
+	if(valid_move_count[current_color]==0){
+		// if()
 		return true;
+	}
 	else
 		return false;
 }
