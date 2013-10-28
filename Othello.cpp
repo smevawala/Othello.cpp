@@ -21,13 +21,18 @@ public:
 	int Make_move();
 	int Random_move();
 	int Print_board(void);
-	bool Check_if_over(void); 
+	int Import_board(string filename);
+	bool Check_if_over(void);
+	int DFS_timeout;
+	bool PlayerFirst;
+	bool PlayerSecond; 
 };
 
 
 
 Board::Board(void) {
 	Reset_board();
+	move_count=0;
 };
 int Board::Reset_board(void){
 	move_count=0;
@@ -400,7 +405,7 @@ int Board::Make_move(){
 		Print_board();
 		return 0;
 	} else{
-		cout<<"Invalid move\t Try Again\n";
+		cout<<"Invalid move\t Try Again Something is wrong\n";
 		board[i][j]=0;
 		Print_board();
 		return 1;
@@ -443,12 +448,12 @@ bool Board::Check_if_over(void){
 
 int main () {
 	// int x, y;
-	// string waiting;
-	int a,b;
+	int a,b, timeout;
+	string infilename;
+	// bool SecondStartFirst=false;
 	cout<<"nothing yet"<<endl;
 	Board game;
 	game.current_color=1;
-	game.Find_valid_moves(game.current_color);
 	cout<<"Pick mode of play"<<endl;
 	cout<<"1:\tHuman plays first"<<endl;
 	cout<<"2:\tComputer plays first"<<endl;
@@ -456,37 +461,98 @@ int main () {
 	cout<<"4:\tInput Board"<<endl;
 	cout<<":";
 	cin>>a;
-	while(1){
+	// while(1){
 		switch(a){
 			case 1:
-				while(game.Check_if_over()==false){
-					cout<<"Pick one of the valid moves\n";
-					if(game.Make_move()==0){
-						if(game.Check_if_over()){
-							// cout<<"game is over"<<endl;
-							break;
-						}
-						cout<<"Computer will now move randomly";
-						cout<<endl;
-						game.Random_move();
-						game.move_count++;
-					}
-				}
-				cout<<"Game is over"<<endl;
-				return 0;
+				game.PlayerFirst=true;
+				game.PlayerSecond=false;
 				break;
 			case 2:
+				game.PlayerFirst=false;
+				game.PlayerSecond=true;
 				break;
 			case 3:
+				game.PlayerFirst=false;
+				game.PlayerSecond=false;
 				break;
 			case 4:
+				cout<<"Enter the relative path of the input file:\t";
+				cin>>infilename;
+				cout<<"\nPick mode of play"<<endl;
+				cout<<"1:\tHuman plays first"<<endl;
+				cout<<"2:\tComputer plays first"<<endl;
+				cout<<"3:\tComputer vs Computer"<<endl;
+				cout<<":";
+				cin>>b;
+				//Loadboard function;
+				switch(b){
+					case 1:
+						game.PlayerFirst=true;
+						game.PlayerSecond=false;
+						break;
+					case 2:
+						game.PlayerFirst=false;
+						game.PlayerSecond=true;
+						break;
+					case 3:
+						game.PlayerFirst=false;
+						game.PlayerSecond=false;
+						break;
+					default:
+						game.PlayerFirst=true;
+						game.PlayerSecond=false;
+						break;
+				}
 				break;
 			default:
+				game.PlayerFirst=true;
+				game.PlayerSecond=false;
 				break;
 		}
+	cout<<"Enter AI timeout:\t";
+	cin>>timeout;
+	game.DFS_timeout=timeout;
+	// }
+	// while(game.Check_if_over()==false){
+	// 	cout<<"Pick one of the valid moves\n";
+	// 	if(game.Make_move()==0){
+	// 		if(game.Check_if_over()){
+	// 			// cout<<"game is over"<<endl;
+	// 			break;
+	// 		}
+	// 		cout<<"Computer will now move randomly";
+	// 		cout<<endl;
+	// 		game.Random_move();
+	// 		game.move_count++;
+	// 	}
+	// }
+	// cout<<"Game is over"<<endl;
+	game.Find_valid_moves(game.current_color);
+
+	while(game.Check_if_over()==false){
+		// if(game.move_count==0 && SecondStartFirst){
+		if(game.PlayerFirst){
+			game.Make_move();
+		}
+		else{
+			game.Random_move();
+		}
+		// }
+
+		if(game.Check_if_over()){
+			// cout<<"game is over"<<endl;
+			break;
+		}
+
+		if(game.PlayerSecond){
+			game.Make_move();
+		}
+		else{
+			game.Random_move();
+		}
+
+		game.move_count++;
 	}
-
-
 	// game.Print_board();
 
 	}
