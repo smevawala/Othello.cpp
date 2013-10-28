@@ -65,9 +65,9 @@ int Board::Print_board(void){
 					cout<<"-\t";
 			} 
 			if(board[i][j]==1)
-				cout<<"X\t"; 
+				cout<<"1\t"; 
 			if(board[i][j]==2)
-				cout<<"O\t"; 
+				cout<<"2\t"; 
 		}
 		cout<<"\n\n";
 	}
@@ -426,13 +426,13 @@ int Board::Random_move(){
 			cout<<"Valid Move\t Board is now:\n";
 			Print_board();
 			return 0;
-		} else{
+		} 
+		else{
 			cout<<"Invalid move\t Try Again\n";
 			board[i][j]=0;
 			// Print_board();
 			return 1;
 		}
-
 }
 bool Board::Check_if_over(void){
 	if(valid_move_count[current_color-1]==0){
