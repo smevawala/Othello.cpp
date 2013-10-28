@@ -50,7 +50,10 @@ int Board::Reset_board(void){
 	piece_count[1]=2;
 return 0;
 }
+int Board::Import_board(string filename){
 
+	return 0;
+}
 int Board::Print_board(void){
 	printf("Move # %i\n\n",move_count);
 	int i,j;
