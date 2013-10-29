@@ -20,6 +20,7 @@ public:
 	int Find_valid_moves(int color);
 	int Make_move();
 	int Random_move();
+	int AI_move();
 	int Print_board(void);
 	int Import_board(string filename);
 	bool Check_if_over(void);
@@ -437,6 +438,11 @@ int Board::Random_move(){
 			return 1;
 		}
 }
+int Board::AI_move(){
+
+
+	return 0;
+}
 bool Board::Check_if_over(void){
 	if(valid_move_count[current_color-1]==0){
 		cout<<valid_move_count[0]<<'\n'<<valid_move_count[1]<<endl;
@@ -515,21 +521,6 @@ int main () {
 	cout<<"Enter AI timeout:\t";
 	cin>>timeout;
 	game.DFS_timeout=timeout;
-	// }
-	// while(game.Check_if_over()==false){
-	// 	cout<<"Pick one of the valid moves\n";
-	// 	if(game.Make_move()==0){
-	// 		if(game.Check_if_over()){
-	// 			// cout<<"game is over"<<endl;
-	// 			break;
-	// 		}
-	// 		cout<<"Computer will now move randomly";
-	// 		cout<<endl;
-	// 		game.Random_move();
-	// 		game.move_count++;
-	// 	}
-	// }
-	// cout<<"Game is over"<<endl;
 	game.Find_valid_moves(game.current_color);
 
 	while(game.Check_if_over()==false){
@@ -559,3 +550,22 @@ int main () {
 	// game.Print_board();
 
 	}
+
+
+
+
+	// }
+	// while(game.Check_if_over()==false){
+	// 	cout<<"Pick one of the valid moves\n";
+	// 	if(game.Make_move()==0){
+	// 		if(game.Check_if_over()){
+	// 			// cout<<"game is over"<<endl;
+	// 			break;
+	// 		}
+	// 		cout<<"Computer will now move randomly";
+	// 		cout<<endl;
+	// 		game.Random_move();
+	// 		game.move_count++;
+	// 	}
+	// }
+	// cout<<"Game is over"<<endl;
