@@ -16,6 +16,7 @@ class Board{
 	int minimax(int node,int depth,int maximizingPlayer);
 public:
 	Board(void);
+	Board(const Board &game);
 	int move_count;
 	int current_color;
 	int Find_valid_moves(int color);
@@ -36,6 +37,11 @@ Board::Board(void) {
 	Reset_board();
 	move_count=0;
 };
+Board::Board(const Board &game){
+	
+
+};
+
 int Board::Reset_board(void){
 	move_count=0;
 	int i,j;
