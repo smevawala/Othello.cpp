@@ -13,6 +13,7 @@ class Board{
 	int piece_count[2];
 	int Reset_board(void);
 	int Evaluate_board(int x, int y, int color);
+	int minimax(int node,int depth,int maximizingPlayer);
 public:
 	Board(void);
 	int move_count;
@@ -439,10 +440,35 @@ int Board::Random_move(){
 		}
 }
 int Board::AI_move(){
-
+	int cindex=current_color-1;
+	// minimax(origin, depth, TRUE)
 
 	return 0;
 }
+
+// int Board::minimax(int node, depth,int maximizingPlayer){
+//     if(depth==0 || valid_move_count[current_color-1]==0){ 
+//     	return 0;
+//         // return the heuristic value of node;
+// 	}
+//     if(current_color==maximizingPlayer){
+//         int bestValue=-99999;
+//         for(int i=0; i<valid_move_count[current_color-1];i++){
+//             int val = minimax(node, board, depth - 1, FALSE);
+//             bestValue = max(bestValue, val);
+//         }
+//         return bestValue;
+//     }
+//     else{
+//         int bestValue = 99999;
+//         for each child of node{
+//             int val = minimax(nodw, depth - 1, TRUE));
+//             bestValue =min(bestValue, val);
+//         }
+//         return bestValue;
+//     }
+// }
+
 bool Board::Check_if_over(void){
 	if(valid_move_count[current_color-1]==0){
 		cout<<valid_move_count[0]<<'\n'<<valid_move_count[1]<<endl;
