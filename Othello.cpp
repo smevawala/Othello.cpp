@@ -5,24 +5,24 @@
 using namespace std;
 
 class Board{
-	int board[8][8];
-	bool valid_moves[2][8][8];
-	int valid_move_count[2];
-	int movelist_i[2][25];
-	int movelist_j[2][25];
 	int piece_count[2];
 	int Reset_board(void);
-	int Evaluate_board(int x, int y, int color);
 	int minimax(int node,int depth,int maximizingPlayer);
 public:
 	Board(void);
 	Board(const Board &game);
 	int move_count;
 	int current_color;
+	int board[8][8];
+	bool valid_moves[2][8][8];
+	int valid_move_count[2];
+	int movelist_i[2][25];
+	int movelist_j[2][25];
 	int Find_valid_moves(int color);
-	int Make_move();
-	int Random_move();
-	int AI_move();
+	int Evaluate_board(int x, int y, int color);
+	// int Make_move();
+	// int Random_move();
+	// int AI_move();
 	int Print_board(void);
 	int Import_board(string filename);
 	bool Check_if_over(void);
@@ -30,15 +30,27 @@ public:
 	bool PlayerFirst;
 	bool PlayerSecond; 
 };
-
-
+	int Make_move(Board game);
+	int Random_move(Board game);
+	int AI_move(Board game);
 
 Board::Board(void) {
 	Reset_board();
 	move_count=0;
 };
 Board::Board(const Board &game){
-	
+	int i, j, n;
+	move_count=game.move_count;
+	current_color=game.current_color;
+	piece_count[0]=game.piece_count[0];
+	piece_count[1]=game.piece_count[1];
+	for(i=0;i<8;i++){
+		for(j=0;j<8;j++){
+			board[i][j]=game.board[i][j];
+			valid_moves[0][i][j]=game.valid_moves[0][i][j];
+			valid_moves[1][i][j]=game.valid_moves[1][i][j];
+		}
+	}
 
 };
 
@@ -390,63 +402,63 @@ int Board::Evaluate_board(int i, int j, int color){
 			}
 		}
 	current_color=opcolor;
-	Find_valid_moves(current_color);
+	Find_valid_moves(opcolor);
 	return 0;
 	}
 }
-int Board::Make_move(){
+int Make_move(Board game){
 	// board[i][j]=color;
-	int cindex=current_color-1, a=128, i,j;
-	Print_board();
+	int cindex=game.current_color-1, a=128, i,j;
+	game.Print_board();
 	cout<<"Choose valid move"<<endl;
-	for(int n=0; n<valid_move_count[cindex];n++){
-		printf("%i:\t%i, %i\n",n+1,movelist_j[cindex][n]+1,movelist_i[cindex][n]+1);
+	for(int n=0; n<game.valid_move_count[cindex];n++){
+		printf("%i:\t%i, %i\n",n+1,game.movelist_j[cindex][n]+1,game.movelist_i[cindex][n]+1);
 	}
-	while(a>=valid_move_count[cindex]){
+	while(a>=game.valid_move_count[cindex]){
 		cout<< "Enter cooresponding number";
 		cin>>a;
 		a=a-1;
-		i=movelist_i[cindex][a];
-		j=movelist_j[cindex][a];
+		i=game.movelist_i[cindex][a];
+		j=game.movelist_j[cindex][a];
 	}
 
 	cout<< "Evaluating board\n\n";
-	if (!Evaluate_board(i,j, current_color)){
+	if (!game.Evaluate_board(i,j, game.current_color)){
 		cout<<"Valid Move\t Board is now:\n";
-		Print_board();
+		game.Print_board();
 		return 0;
 	} else{
 		cout<<"Invalid move\t Try Again Something is wrong\n";
-		board[i][j]=0;
-		Print_board();
+		game.board[i][j]=0;
+		game.Print_board();
 		return 1;
 	}
 }
-int Board::Random_move(){
-	int cindex=current_color-1;
+int Random_move(Board game){
+	int cindex=game.current_color-1;
 		srand (time(NULL));
-		int rmove=rand() % valid_move_count[cindex];
+		int rmove=rand() % game.valid_move_count[cindex];
 		// cout<<"valid_move_count:"<<valid_move_count[cindex]<<endl;
 		// cout<<"random move:"<<rmove<<endl;
-		int i= movelist_i[cindex][rmove];
-		int j= movelist_j[cindex][rmove];
-		board[i][j]=current_color;
-		Print_board();
+		int i= game.movelist_i[cindex][rmove];
+		int j= game.movelist_j[cindex][rmove];
+		game.board[i][j]=game.current_color;
+		game.Print_board();
 		cout<< "Evaluating board\n\n";
-		if (!Evaluate_board(i,j, current_color)){
+		if (!game.Evaluate_board(i,j, game.current_color)){
 			cout<<"Valid Move\t Board is now:\n";
-			Print_board();
+			game.Print_board();
 			return 0;
 		} 
 		else{
 			cout<<"Invalid move\t Try Again\n";
-			board[i][j]=0;
+			game.board[i][j]=0;
 			// Print_board();
 			return 1;
 		}
 }
-int Board::AI_move(){
-	int cindex=current_color-1;
+int AI_move(Board game){
+	int cindex=game.current_color-1;
 	// minimax(origin, depth, TRUE)
 
 	return 0;
@@ -558,10 +570,10 @@ int main () {
 	while(game.Check_if_over()==false){
 		// if(game.move_count==0 && SecondStartFirst){
 		if(game.PlayerFirst){
-			game.Make_move();
+			Make_move(game);
 		}
 		else{
-			game.Random_move();
+			Random_move(game);
 		}
 		// }
 
@@ -571,10 +583,10 @@ int main () {
 		}
 
 		if(game.PlayerSecond){
-			game.Make_move();
+			Make_move(game);
 		}
 		else{
-			game.Random_move();
+			Random_move(game);
 		}
 
 		game.move_count++;
