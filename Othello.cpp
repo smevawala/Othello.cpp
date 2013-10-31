@@ -1,16 +1,17 @@
 #include <iostream>
 #include <stdio.h>
+#include <climits>
 #include <stdlib.h>     /* srand, rand */
 #include <time.h>       /* time */
 using namespace std;
 
 class Board{
 	int piece_count[2];
-	int Reset_board(void);
-	int minimax(int node,int depth,int maximizingPlayer);
+	int minimax(Board state,int i, int j, int depth,bool maximizingPlayer);
 public:
 	Board(void);
 	Board(const Board &game);
+	int Reset_board(void);
 	int move_count;
 	int current_color;
 	int board[8][8];
@@ -20,23 +21,20 @@ public:
 	int movelist_j[2][25];
 	int Find_valid_moves(int color);
 	int Evaluate_board(int x, int y, int color);
-	// int Make_move();
-	// int Random_move();
-	// int AI_move();
 	int Print_board(void);
 	int Import_board(string filename);
 	bool Check_if_over(void);
 	int DFS_timeout;
 	bool PlayerFirst;
 	bool PlayerSecond; 
-};
-	int Make_move(Board game);
-	int Random_move(Board game);
+	int Make_move();
+	int Random_move();
 	int AI_move(Board game);
+};
 
 Board::Board(void) {
-	Reset_board();
-	move_count=0;
+	// Reset_board();
+	// move_count=0;
 };
 Board::Board(const Board &game){
 	int i, j, n;
@@ -406,90 +404,100 @@ int Board::Evaluate_board(int i, int j, int color){
 	return 0;
 	}
 }
-int Make_move(Board game){
-	// board[i][j]=color;
-	int cindex=game.current_color-1, a=128, i,j;
-	game.Print_board();
+int Board::Make_move(){
+	 // board[i][j]=color;
+	int cindex=current_color-1, a=128, i,j;
+	Print_board();
 	cout<<"Choose valid move"<<endl;
-	for(int n=0; n<game.valid_move_count[cindex];n++){
-		printf("%i:\t%i, %i\n",n+1,game.movelist_j[cindex][n]+1,game.movelist_i[cindex][n]+1);
+	for(int n=0; n<valid_move_count[cindex];n++){
+		printf("%i:\t%i, %i\n",n+1,movelist_j[cindex][n]+1,movelist_i[cindex][n]+1);
 	}
-	while(a>=game.valid_move_count[cindex]){
+	while(a>=valid_move_count[cindex]){
 		cout<< "Enter cooresponding number";
 		cin>>a;
 		a=a-1;
-		i=game.movelist_i[cindex][a];
-		j=game.movelist_j[cindex][a];
+		// cout<<a<<endl;
+		i=movelist_i[cindex][a];
+		j=movelist_j[cindex][a];
 	}
 
 	cout<< "Evaluating board\n\n";
-	if (!game.Evaluate_board(i,j, game.current_color)){
+	if (!Evaluate_board(i,j, current_color)){
 		cout<<"Valid Move\t Board is now:\n";
-		game.Print_board();
+		Print_board();
 		return 0;
 	} else{
 		cout<<"Invalid move\t Try Again Something is wrong\n";
-		game.board[i][j]=0;
-		game.Print_board();
+		board[i][j]=0;
+		Print_board();
 		return 1;
 	}
 }
-int Random_move(Board game){
-	int cindex=game.current_color-1;
+int Board::Random_move(){
+	int cindex=current_color-1;
 		srand (time(NULL));
-		int rmove=rand() % game.valid_move_count[cindex];
+		int rmove=rand() % valid_move_count[cindex];
 		// cout<<"valid_move_count:"<<valid_move_count[cindex]<<endl;
 		// cout<<"random move:"<<rmove<<endl;
-		int i= game.movelist_i[cindex][rmove];
-		int j= game.movelist_j[cindex][rmove];
-		game.board[i][j]=game.current_color;
-		game.Print_board();
+		int i= movelist_i[cindex][rmove];
+		int j= movelist_j[cindex][rmove];
+		board[i][j]=current_color;
+		Print_board();
 		cout<< "Evaluating board\n\n";
-		if (!game.Evaluate_board(i,j, game.current_color)){
+		if (!Evaluate_board(i,j, current_color)){
 			cout<<"Valid Move\t Board is now:\n";
-			game.Print_board();
+			Print_board();
 			return 0;
 		} 
 		else{
 			cout<<"Invalid move\t Try Again\n";
-			game.board[i][j]=0;
+			board[i][j]=0;
 			// Print_board();
 			return 1;
 		}
 }
-int AI_move(Board game){
-	int cindex=game.current_color-1;
-	// minimax(origin, depth, TRUE)
+int Board::AI_move(Board game){
+	int cindex=current_color-1;
+	Board state(game);
+	minimax(state,9,9, 2, true);
 
 	return 0;
 }
 
-// int Board::minimax(int node, depth,int maximizingPlayer){
-//     if(depth==0 || valid_move_count[current_color-1]==0){ 
-//     	return 0;
-//         // return the heuristic value of node;
-// 	}
-//     if(current_color==maximizingPlayer){
-//         int bestValue=-99999;
-//         for(int i=0; i<valid_move_count[current_color-1];i++){
-//             int val = minimax(node, board, depth - 1, FALSE);
-//             bestValue = max(bestValue, val);
-//         }
-//         return bestValue;
-//     }
-//     else{
-//         int bestValue = 99999;
-//         for each child of node{
-//             int val = minimax(nodw, depth - 1, TRUE));
-//             bestValue =min(bestValue, val);
-//         }
-//         return bestValue;
-//     }
-// }
+int Board::minimax(Board state,int i, int j, int depth, bool maximizingPlayer){
+	if(i!=9){
+		state.Evaluate_board(i, j, state.current_color);
+
+	}
+	int cindex=state.current_color-1;
+    if(depth==0 || state.valid_move_count[cindex]==0){ 
+    	return 0;
+        // return the heuristic value of node;  also remeber to account for move skipping
+	}
+	int n=0;
+    if(maximizingPlayer){
+        int bestValue=INT_MIN;
+        for(n=0; n<state.valid_move_count[state.current_color-1];n++){
+            int val = minimax(state, state.movelist_i[cindex][n], state.movelist_j[cindex][n], depth - 1, false);
+            bestValue = max(bestValue, val);
+        }
+        return bestValue;
+    }
+    else{
+        int bestValue = INT_MAX;
+        for(n=0; n<state.valid_move_count[state.current_color-1];n++){
+            int val = minimax(state, state.movelist_i[cindex][n], state.movelist_j[cindex][n], depth - 1, false);
+            bestValue =min(bestValue, val);
+        }
+        return bestValue;
+    }
+}
 
 bool Board::Check_if_over(void){
 	if(valid_move_count[current_color-1]==0){
 		cout<<valid_move_count[0]<<'\n'<<valid_move_count[1]<<endl;
+		cout<<"Game is over"<<endl;
+
 		return true;
 	}
 	else{
@@ -506,6 +514,7 @@ int main () {
 	// bool SecondStartFirst=false;
 	cout<<"nothing yet"<<endl;
 	Board game;
+	game.Reset_board();
 	game.current_color=1;
 	cout<<"Pick mode of play"<<endl;
 	cout<<"1:\tHuman plays first"<<endl;
@@ -513,6 +522,7 @@ int main () {
 	cout<<"3:\tComputer vs Computer"<<endl;
 	cout<<"4:\tInput Board"<<endl;
 	cout<<":";
+	game.AI_move(game);
 	cin>>a;
 	// while(1){
 		switch(a){
@@ -570,10 +580,10 @@ int main () {
 	while(game.Check_if_over()==false){
 		// if(game.move_count==0 && SecondStartFirst){
 		if(game.PlayerFirst){
-			Make_move(game);
+			game.Make_move();
 		}
 		else{
-			Random_move(game);
+			game.Random_move();
 		}
 		// }
 
@@ -583,10 +593,10 @@ int main () {
 		}
 
 		if(game.PlayerSecond){
-			Make_move(game);
+			game.Make_move();
 		}
 		else{
-			Random_move(game);
+			game.Random_move();
 		}
 
 		game.move_count++;
