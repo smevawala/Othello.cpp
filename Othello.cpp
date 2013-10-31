@@ -99,9 +99,9 @@ int Board::Print_board(void){
 					cout<<"-\t";
 			} 
 			if(board[i][j]==1)
-				cout<<"1\t"; 
+				cout<<"\e[033;31m 0\e[033;39m\t"; 
 			if(board[i][j]==2)
-				cout<<"2\t"; 
+				cout<<"\e[033;34m 0\e[033;39m\t"; 
 		}
 		cout<<"\n\n";
 	}
@@ -413,7 +413,7 @@ int Board::Evaluate_board(int i, int j, int color){
 			}
 		}
 	current_color=opcolor;
-	cout<<"finding valid moves for color: "<<opcolor<<endl;
+	// cout<<"finding valid moves for color: "<<opcolor<<endl;
 	Find_valid_moves(opcolor);
 	return 0;
 	}
@@ -421,7 +421,7 @@ int Board::Evaluate_board(int i, int j, int color){
 int Board::Make_move(){
 	 // board[i][j]=color;
 	int cindex=current_color-1, a=128, i,j;
-	Print_board();
+	// Print_board();
 	cout<<"Choose valid move"<<endl;
 	for(int n=0; n<valid_move_count[cindex];n++){
 		printf("%i:\t%i, %i\n",n+1,movelist_j[cindex][n]+1,movelist_i[cindex][n]+1);
@@ -475,7 +475,7 @@ int Board::AI_move(Board game){
 	int cindex=current_color-1;
 	Board state(game);
 	// Print_board();
-	Value_struct val=minimax(state,9,9,6, true);
+	Value_struct val=minimax(state,9,9, 7, true);
 	printf("ai i=%i \t ai j= %i\n",val.i,val.j);
 	if (!Evaluate_board(val.i,val.j, current_color)){
 		cout<<"Valid Move\t Board is now:\n";
@@ -500,35 +500,36 @@ Value_struct Board::minimax(Board state,int i, int j, int depth, bool maximizing
 	// cout<<"depth: "<<depth<<endl;
 	int cindex=state.current_color-1;
     if(depth==0 || state.valid_move_count[cindex]==0){
-		// int opcolor;
-		cindex=current_color-1;
+		int opcolor;
+		cindex=state.current_color-1;
 		int opindex=!cindex;
-		// if(current_color==1)
-		// 	opcolor=2;
-		// if(current_color==2)
-		// 	opcolor=1;
+		if(state.current_color==1)
+			opcolor=2;
+		if(state.current_color==2)
+			opcolor=1;
 
-    	// int h, corners=0, edge=0;
-    	// if(state.board[0][0]==current_color)
-    	// 	corners++;
-    	// if(state.board[0][7]==current_color)
-    	// 	corners++;
-    	// if(state.board[7][0]==current_color)
-    	// 	corners++;
-    	// if(state.board[7][7]==current_color)
-    	// 	corners++;
-    	// if(state.board[0][0]==opcolor)
-    	// 	corners--;
-    	// if(state.board[0][7]==opcolor)
-    	// 	corners--;
-    	// if(state.board[7][0]==opcolor)
-    	// 	corners--;
-    	// if(state.board[7][7]==opcolor)
-    	// 	corners--;
+    	int h, corners=0, edge=0;
+    	if(state.board[0][0]==state.current_color)
+    		corners++;
+    	if(state.board[0][7]==state.current_color)
+    		corners++;
+    	if(state.board[7][0]==state.current_color)
+    		corners++;
+    	if(state.board[7][7]==state.current_color)
+    		corners++;
+    	if(state.board[0][0]==opcolor)
+    		corners--;
+    	if(state.board[0][7]==opcolor)
+    		corners--;
+    	if(state.board[7][0]==opcolor)
+    		corners--;
+    	if(state.board[7][7]==opcolor)
+    		corners--;
 		Value_struct val;
 		val.i=i;
 		val.j=j;
-		val.score=state.piece_count[cindex]-state.piece_count[opindex];
+		// val.score=corners;
+		val.score=corners*40+state.piece_count[cindex]-state.piece_count[opindex];
     	return val;
         // return the heuristic value of node;  also remeber to account for move skipping
 	}
@@ -542,6 +543,7 @@ Value_struct Board::minimax(Board state,int i, int j, int depth, bool maximizing
         	// cout<<"before recursion\n";
 			// printf("i=%i\tj=%i\n",state.movelist_i[cindex][n], state.movelist_j[cindex][n]);
             val = minimax(state, state.movelist_i[cindex][n], state.movelist_j[cindex][n], depth - 1, false);
+
             if(val.score>bestValue.score){
             	bestValue.score=val.score;
             	bestValue.i=state.movelist_i[cindex][n];
@@ -653,7 +655,7 @@ int main () {
 	cin>>timeout;
 	game.DFS_timeout=timeout;
 	game.Find_valid_moves(game.current_color);
-
+	game.Print_board();
 	while(game.Check_if_over()==false){
 		// if(game.move_count==0 && SecondStartFirst){
 		if(game.PlayerFirst){
