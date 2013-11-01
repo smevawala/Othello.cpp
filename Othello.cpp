@@ -14,7 +14,7 @@ int skip=-1;
 
 class Board{
 	int piece_count[2];
-	Value_struct minimax(Board state,int i, int j, int depth,bool maximizingPlayer);
+	Value_struct minimax(Board state,int i, int j, int depth,int a, int b, bool maximizingPlayer);
 public:
 	Board(void);
 	Board(const Board &game);
@@ -96,7 +96,7 @@ int Board::Print_board(void){
 		for(j=0;j<8;j++){
 			if(board[i][j]==0){
 				if(valid_moves[current_color-1][i][j]){
-					cout<<"\e[033;32m"<<n<<"\e[033;39m"<<"\t";
+					cout<<"\e[033;33m"<<n<<"\e[033;39m"<<"\t";
 					n++;
 				}
 					// printf("\e[033;32m%ie[033;39m\t",n);
@@ -516,7 +516,7 @@ int Board::AI_move(Board game){
 				exit(1);
 			}
 		}
-		Value_struct val=minimax(state,9,10, 6, true);
+		Value_struct val=minimax(state,9,10, 6,INT_MIN,INT_MAX, true);
 		printf("ai i=%i \t ai j= %i\n",val.i,val.j);
 		if (!Evaluate_board(val.i,val.j, current_color)){
 			cout<<"Valid Move\t Board is now:\n";
@@ -538,7 +538,7 @@ int Board::AI_move(Board game){
 	return 0;
 }
 
-Value_struct Board::minimax(Board state,int i, int j, int depth, bool maximizingPlayer){
+Value_struct Board::minimax(Board state,int i, int j, int depth, int a, int b, bool maximizingPlayer){
 	if(i!=9){
 		// cout<<"Evaluate_board in minimax\n";
 		// printf("i=%i\tj=%i\n",i, j);
@@ -551,11 +551,8 @@ Value_struct Board::minimax(Board state,int i, int j, int depth, bool maximizing
 		int opcolor;
 		cindex=state.current_color-1;
 		int opindex=!cindex;
-		if(state.current_color==1)
-			opcolor=2;
-		if(state.current_color==2)
-			opcolor=1;
-
+		opcolor=opindex+1;
+		state.Find_valid_moves(opcolor);
     	int corners=0, edges=0;
     	if(state.board[0][0]==state.current_color)
     		corners++;
@@ -595,7 +592,7 @@ Value_struct Board::minimax(Board state,int i, int j, int depth, bool maximizing
 		val.i=i;
 		val.j=j;
 		// val.score=corners;
-		val.score=corners*250+edges*75+state.piece_count[cindex]-state.piece_count[opindex]+15*state.valid_move_count[cindex];
+		val.score=corners*300+edges*100+state.piece_count[cindex]-state.piece_count[opindex]+35*(state.valid_move_count[cindex]-state.valid_move_count[opindex]);
     	return val;
         // return the heuristic value of node;  also remeber to account for move skipping
 	}
@@ -603,18 +600,21 @@ Value_struct Board::minimax(Board state,int i, int j, int depth, bool maximizing
     if(maximizingPlayer){
     	// cout<<"maximizingPlayer\n";
     	Value_struct bestValue;
-        bestValue.score=INT_MIN;
+        bestValue.score=a;
         for(n=0; n<state.valid_move_count[state.current_color-1];n++){
         	Value_struct val;
         	// cout<<"before recursion\n";
 			// printf("i=%i\tj=%i\n",state.movelist_i[cindex][n], state.movelist_j[cindex][n]);
-            val = minimax(state, state.movelist_i[cindex][n], state.movelist_j[cindex][n], depth - 1, false);
+            val = minimax(state, state.movelist_i[cindex][n], state.movelist_j[cindex][n], depth - 1,a,b, false);
 
             if(val.score>bestValue.score){
             	bestValue.score=val.score;
             	bestValue.i=state.movelist_i[cindex][n];
             	bestValue.j=state.movelist_j[cindex][n];
 
+            }
+            if(b<=a){
+            	break;
             }
             // bestValue = max(bestValue, val);
         }
@@ -623,14 +623,17 @@ Value_struct Board::minimax(Board state,int i, int j, int depth, bool maximizing
     else{
     	Value_struct bestValue;
     	// cout<<"minimizingPlayer\n";
-        bestValue.score=INT_MAX;
+        bestValue.score=b;
         for(n=0; n<state.valid_move_count[state.current_color-1];n++){
         	Value_struct val;
-            val = minimax(state, state.movelist_i[cindex][n], state.movelist_j[cindex][n], depth - 1, false);
+            val = minimax(state, state.movelist_i[cindex][n], state.movelist_j[cindex][n], depth - 1,a,b, false);
             if(val.score<bestValue.score){
             	bestValue.score=val.score;
             	bestValue.i=state.movelist_i[cindex][n];
             	bestValue.j=state.movelist_j[cindex][n];
+            }
+            if(b<=a){
+            	break;
             }
             // bestValue =min(bestValue, val);
         }
@@ -746,8 +749,8 @@ int main () {
 				game.Make_move();
 			}
 			else{
-				game.AI_move(game);
-				// game.Random_move();
+				// game.AI_move(game);
+				game.Random_move();
 			}
 			if(game.Check_if_over()){
 				// cout<<"game is over"<<endl;
