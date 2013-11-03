@@ -500,8 +500,11 @@ int Board::Random_move(){
 }
 int Board::AI_move(Board game){
 	// cout<<"got here in ai\n";
-	int cindex=current_color-1;
+	int cindex=current_color-1, d;
 	Board state(game);
+	clock_t t, addend;
+	Value_struct val;
+	addend=CLOCKS_PER_SEC*DFS_timeout/2;
 	// Print_board();
 	// if(valid_move_count[cindex]!=0){
 		if(valid_move_count[cindex]==1){
@@ -516,8 +519,16 @@ int Board::AI_move(Board game){
 				exit(1);
 			}
 		}
-		Value_struct val=minimax(state,9,10, 6,INT_MIN,INT_MAX, true);
-		printf("ai i=%i \t ai j= %i\n",val.i,val.j);
+		t=clock();
+		t=t+addend;
+		// cout<<"begin loop\n";
+		for(d=1;clock()<t;d++){
+			// cout<<"lopping\n";
+			Board state(game);
+			val=minimax(state,9,10, d,INT_MIN,INT_MAX, true);
+			// cout<<d<<endl;
+		}
+		printf("ai i=%i \t ai j= %i with depth %i\n",val.i,val.j,d);
 		if (!Evaluate_board(val.i,val.j, current_color)){
 			cout<<"Valid Move\t Board is now:\n";
 			Print_board();
@@ -553,7 +564,7 @@ Value_struct Board::minimax(Board state,int i, int j, int depth, int a, int b, b
 		int opindex=!cindex;
 		opcolor=opindex+1;
 		state.Find_valid_moves(opcolor);
-    	int corners=0, edges=0;
+    	int corners=0, edges=0, win=0;
     	if(state.board[0][0]==state.current_color)
     		corners++;
     	if(state.board[0][7]==state.current_color)
@@ -592,7 +603,17 @@ Value_struct Board::minimax(Board state,int i, int j, int depth, int a, int b, b
 		val.i=i;
 		val.j=j;
 		// val.score=corners;
-		val.score=corners*300+edges*100+state.piece_count[cindex]-state.piece_count[opindex]+35*(state.valid_move_count[cindex]-state.valid_move_count[opindex]);
+		if(state.valid_move_count[cindex]==0 && state.valid_move_count[opindex]==0){
+				if(state.piece_count[cindex]>state.piece_count[opindex]){
+					win=INT_MAX-9999;
+					// cout<<"someone can win\n";
+				}
+				else{
+					win=INT_MIN+9999;
+					// cout<<"someone can lose\n";
+				}
+		}
+		val.score=win+corners*800+edges*80+state.piece_count[cindex]-state.piece_count[opindex]+35*(state.valid_move_count[cindex]-state.valid_move_count[opindex]);
     	return val;
         // return the heuristic value of node;  also remeber to account for move skipping
 	}
@@ -742,15 +763,15 @@ int main () {
 	game.Find_valid_moves(game.current_color);
 	game.Print_board();
 	while(1){
-		game.move_count++;
 
 		if(game.valid_move_count[game.current_color-1]!=0){
+			game.move_count++;
 			if(game.PlayerFirst){
 				game.Make_move();
 			}
 			else{
-				// game.AI_move(game);
-				game.Random_move();
+				game.AI_move(game);
+				// game.Random_move();
 			}
 			if(game.Check_if_over()){
 				// cout<<"game is over"<<endl;
@@ -767,9 +788,9 @@ int main () {
 			game.Find_valid_moves(game.current_color);
 			game.Print_board();
 		}
-		game.move_count++;
 
 		if(game.valid_move_count[game.current_color-1]!=0){
+			game.move_count++;
 			if(game.PlayerSecond){
 				game.Make_move();
 			}
